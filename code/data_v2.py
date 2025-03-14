@@ -65,6 +65,7 @@ def read_csv(filename, sep=',', text_column='Text', label_column='Label'):
     Reads a CSV file and converts the text data into a numerical representation using CountVectorizer.
     Uses LabelEncoder for label encoding.
     """
+    
     data = pd.read_csv(filename, sep=sep, quotechar='"', on_bad_lines='skip')
     
     # Clean data - handle NaN values in text column
@@ -100,7 +101,7 @@ def read_csv(filename, sep=',', text_column='Text', label_column='Label'):
     dataset.label_mapping = label_mapping
     dataset.vectorizer = vectorizer
     
-    return dataset
+    return dataset , vectorizer
 
 if __name__ == '__main__':
     try:
@@ -166,6 +167,8 @@ if __name__ == '__main__':
 
         print(f"\nRNN Training accuracy: {rnn_train_acc:.4f}")
         print(f"RNN Test accuracy: {rnn_test_acc:.4f}")
+        
+
 
         # ------------------ Model Comparison ------------------
         print("\nModel Performance Comparison:")

@@ -113,26 +113,37 @@ class NeuralNetwork:
 if __name__ == '__main__':
     from activation import SigmoidActivation
     from metrics import mse, accuracy
-    from data import read_csv
+    from data_v2 import read_csv
 
     # training data
-    dataset = read_csv('../datasets/combined_dataset.csv', 
-                   sep=',', 
-                   text_column='Text',  # Nome exato da coluna de texto no CSV
-                   label_column='Label')  # Nome exato da coluna de rótulos no CSV
-
+    dataset_treino , vectorizer = read_csv('../datasets/combined_dataset_treino.csv', 
+                                sep=',', 
+                                text_column='Text',  # Nome exato da coluna de texto no CSV
+                                label_column='Label')  # Nome exato da coluna de rótulos no CSV
+    
+    dataset_test , _ = read_csv('../datasets/combined_dataset_test.csv', 
+                        sep=',', 
+                        text_column='Text',  # Nome exato da coluna de texto no CSV
+                        label_column='Label', # Nome exato da coluna de rótulos no CSV
+                        vectorizer=vectorizer)  
+    
+    
     # network
     net = NeuralNetwork(epochs=1000, batch_size=16, learning_rate=0.1, verbose=True,
                         loss=MeanSquaredError, metric=accuracy)
-    n_features = dataset.X.shape[1]
+    
+    n_features = dataset_treino.X.shape[1]
     net.add(DenseLayer(6, (n_features,)))
     net.add(SigmoidActivation())
     net.add(DenseLayer(1))
     net.add(SigmoidActivation())
+    
+    print(f"Training set shape: {dataset_treino.X.shape}")
+    print(f"Test set shape: {dataset_test.X.shape}")
 
     # train
-    net.fit(dataset)
+    net.fit(dataset_treino)
 
     # test
-    out = net.predict(dataset)
-    print(net.score(dataset, out))
+    out = net.predict(dataset_test)
+    print(net.score(dataset_test, out))

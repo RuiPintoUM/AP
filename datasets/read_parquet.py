@@ -1,6 +1,8 @@
 import pandas as pd
 import glob
 
+
+
 # Define the path to the parquet files
 parquet_files_path = 'train-*.parquet'
 
@@ -29,7 +31,7 @@ for file in parquet_files:
 combined_df = pd.concat(dfs, ignore_index=True)
 
 # Save the combined dataframe to a CSV file
-csv_file = 'combined_dataset2.csv'
+csv_file = 'combined_dataset.csv'
 combined_df.to_csv(csv_file, index=False, quoting=1)
 
 print(f"All parquet files have been merged and saved to {csv_file}")

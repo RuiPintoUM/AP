@@ -44,23 +44,29 @@ class Data:
         return pd.DataFrame.from_dict(data, orient="index", columns=self.features)
 
 # Updated function to read CSV and process data
-def read_csv(filename, sep=',', text_column='Text', label_column='Label'):
+def read_csv(filename, sep=',', text_column='Text', label_column='Label', vectorizer=None):
     """
     Reads a CSV file and converts the text data into a numerical representation using CountVectorizer.
     Uses LabelEncoder for label encoding.
     """
     data = pd.read_csv(filename, sep=sep, quotechar='"', on_bad_lines='skip')
 
-    # Use CountVectorizer for Bag of Words transformation
-    vectorizer = CountVectorizer()
-    X = vectorizer.fit_transform(data[text_column].values).toarray()
-    features = vectorizer.get_feature_names_out()
+    if vectorizer is None:
+        # Apenas no treino: Criar e ajustar o vocabulário
+        vectorizer = CountVectorizer()
+        X = vectorizer.fit_transform(data[text_column].values).toarray()
+        features = vectorizer.get_feature_names_out()
+        
+    else:
+        # No teste: Apenas transformar os dados usando vocabulário do treino
+        X = vectorizer.transform(data[text_column].values).toarray()
+        features = vectorizer.get_feature_names_out()
 
     # Use LabelEncoder to convert labels to numerical values
     label_encoder = LabelEncoder()
     y = label_encoder.fit_transform(data[label_column].values)
 
-    return Data(X=X, y=y, features=features, label=label_column)
+    return Data(X=X, y=y, features=features, label=label_column) , vectorizer
 
 # Example usage with the provided dataset
 if __name__ == '__main__':

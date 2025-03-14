@@ -24,7 +24,7 @@ class LogisticRegression:
         self.weights = np.zeros((n_features, 1))
         self.bias = 0
         costs = []
-        
+
         # Reshape y for matrix multiplication
         Y = y.reshape(-1, 1)
         
@@ -41,7 +41,7 @@ class LogisticRegression:
             # Backward pass (compute gradients)
             dw = 1/m * np.dot(X.T, (A - Y))
             db = 1/m * np.sum(A - Y)
-            
+
             # Update parameters
             self.weights -= self.learning_rate * dw
             self.bias -= self.learning_rate * db

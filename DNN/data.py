@@ -95,24 +95,29 @@ def text_to_bow(text, vocabulary):
             vector[index] += 1  # Conta a frequência da palavra no texto
     return vector
 
-def read_csv(filename, sep=',', text_column='text', label_column='label'):
+def read_csv(filename, sep=',', text_column='Text', label_column='Label'):
     """
-    Lê um CSV e converte o texto para uma representação numérica usando apenas numpy.
+    Reads a CSV file and converts the text data into a numerical representation using CountVectorizer.
+    Uses LabelEncoder for label encoding.
     """
-    data = pd.read_csv(filename, sep=sep)
+    data = pd.read_csv(filename, sep=sep, quotechar='"', on_bad_lines='skip')
 
-    # Cria o vocabulário com todas as palavras únicas
-    vocabulary = build_vocabulary(data[text_column].values)
+    if vectorizer is None:
+        # Apenas no treino: Criar e ajustar o vocabulário
+        vectorizer = CountVectorizer()
+        X = vectorizer.fit_transform(data[text_column].values).toarray()
+        features = vectorizer.get_feature_names_out()
+        
+    else:
+        # No teste: Apenas transformar os dados usando vocabulário do treino
+        X = vectorizer.transform(data[text_column].values).toarray()
+        features = vectorizer.get_feature_names_out()
 
-    # Converte cada texto para um vetor Bag of Words (BoW)
-    X = np.array([text_to_bow(text, vocabulary) for text in data[text_column].values])
+    # Use LabelEncoder to convert labels to numerical values
+    label_encoder = LabelEncoder()
+    y = label_encoder.fit_transform(data[label_column].values)
 
-    # Converte os rótulos para valores numéricos (e.g., 'human' -> 0, 'ai' -> 1)
-    y = np.where(data[label_column].values == 'human', 0, 1)
-
-    features = list(vocabulary.keys())
-
-    return Data(X=X, y=y, features=features, label=label_column)
+    return Data(X=X, y=y, features=features, label=label_column) , vectorizer
 
 
 if __name__ == '__main__':

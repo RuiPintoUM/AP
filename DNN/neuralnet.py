@@ -4,7 +4,7 @@
 import numpy as np
 
 from layers import DenseLayer
-from losses import LossFunction, MeanSquaredError
+from losses import LossFunction, MeanSquaredError, BinaryCrossEntropy
 from optimizer import Optimizer
 from metrics import mse
 
@@ -110,10 +110,19 @@ class NeuralNetwork:
             raise ValueError("No metric specified for the neural network.")
 
 
+class Dataset:
+    def __init__(self, X, y):
+        self.X = X
+        self.y = y
+
 if __name__ == '__main__':
-    from activation import SigmoidActivation
+    from activation import SigmoidActivation, ReLUActivation
     from metrics import mse, accuracy
     from data_v2 import read_csv
+    from layers import DropoutLayer
+    
+    from sklearn.model_selection import train_test_split
+
 
     # training data
     dataset_treino , vectorizer = read_csv('../datasets/combined_dataset_treino.csv', 
@@ -126,15 +135,29 @@ if __name__ == '__main__':
                         text_column='Text',  # Nome exato da coluna de texto no CSV
                         label_column='Label', # Nome exato da coluna de rótulos no CSV
                         vectorizer=vectorizer)  
-    
+
+    # Dividir os dados corretamente
+    #X_train, X_test, y_train, y_test = train_test_split(
+    #    dataset_treino.X, dataset_treino.y, 
+    #    test_size=0.2, random_state=42, stratify=dataset_treino.y
+    #)
+
+    # Atualizar os datasets corretamente
+    #dataset_treino = Dataset(X_train, y_train)
+    #dataset_test = Dataset(X_test, y_test)
     
     # network
-    net = NeuralNetwork(epochs=1000, batch_size=16, learning_rate=0.1, verbose=True,
-                        loss=MeanSquaredError, metric=accuracy)
+    net = NeuralNetwork(epochs=100, batch_size=16, learning_rate=0.005, verbose=True,
+                        optimizer=Optimizer(learning_rate=0.005, momentum=0.9, weight_decay=1e-5),
+                        loss=BinaryCrossEntropy, metric=accuracy)
     
     n_features = dataset_treino.X.shape[1]
-    net.add(DenseLayer(6, (n_features,)))
-    net.add(SigmoidActivation())
+    net.add(DenseLayer(32, (n_features,)))
+    net.add(ReLUActivation())
+    net.add(DropoutLayer(0.3)) 
+    net.add(DenseLayer(16))
+    net.add(ReLUActivation())
+    net.add(DropoutLayer(0.4))
     net.add(DenseLayer(1))
     net.add(SigmoidActivation())
     
@@ -146,4 +169,4 @@ if __name__ == '__main__':
 
     # test
     out = net.predict(dataset_test)
-    print(net.score(dataset_test, out))
+    print(f"O modelo obteve um score de {net.score(dataset_test, out)}")

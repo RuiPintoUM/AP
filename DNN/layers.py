@@ -83,5 +83,32 @@ class DenseLayer (Layer):
  
     def output_shape(self):
          return (self.n_units,) 
+     
+     
+class DropoutLayer(Layer):
+    
+    def __init__(self, drop_rate):
+        """
+        drop_rate: percentual de neurônios a serem desativados (ex: 0.5 = 50%)
+        """
+        super().__init__()
+        self.drop_rate = drop_rate
+        self.mask = None  # Máscara de dropout
+
+    def forward_propagation(self, inputs, training=True):
+        if training:
+            # Criar máscara de dropout (0 para desativado, 1 para ativado)
+            self.mask = np.random.binomial(1, 1 - self.drop_rate, size=inputs.shape)
+            return inputs * self.mask  # Aplica dropout
+        return inputs  # Na inferência, não aplica dropout
+
+    def backward_propagation(self, output_error):
+        return output_error * self.mask  # Propaga apenas os neurônios ativos
+
+    def output_shape(self):
+        return self._input_shape
+
+    def parameters(self):
+        return 0  # Dropout não tem parâmetros treináveis
 
     

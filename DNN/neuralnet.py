@@ -166,7 +166,6 @@ if __name__ == '__main__':
 
     # train
     net.fit(dataset_treino)
+        
+    
 
-    # test
-    out = net.predict(dataset_test)
-    print(f"O modelo obteve um score de {net.score(dataset_test, out)}")

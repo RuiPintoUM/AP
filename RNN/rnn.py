@@ -3,6 +3,7 @@ from layers import RecurrentLayer
 from losses import BinaryCrossEntropy
 from optimizer import Optimizer
 from metrics import accuracy
+from LogisticRegression import LogisticRegression
 
 class RecurrentNeuralNetwork:
     def __init__(self, epochs=100, batch_size=16, optimizer=None, learning_rate=0.01, verbose=False, loss=BinaryCrossEntropy, metric=accuracy):
@@ -110,6 +111,20 @@ if __name__ == '__main__':
 
     # Treinar o modelo
     rnn.fit(dataset_treino)
+    
+        # Obter representações da RNN
+    rnn_train_output = rnn.predict(dataset_treino)
+    rnn_test_output = rnn.predict(dataset_test)
+
+    # Treinar o modelo de regressão logística usando as representações da RNN
+    logistic_regression = LogisticRegression(learning_rate=0.01, num_iterations=1000)
+    logistic_regression.fit(rnn_train_output, dataset_treino.y)
+
+    # Testar o modelo de regressão logística
+    logistic_predictions = logistic_regression.predict(rnn_test_output)
+    logistic_score = logistic_regression.score(rnn_test_output, dataset_test.y)
+
+    print(f"Score da regressão logística: {logistic_score}")
 
     # Testar o modelo
     out = rnn.predict(dataset_test)

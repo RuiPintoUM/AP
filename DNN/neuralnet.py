@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import pickle as pickle
 
 from layers import DenseLayer
 from losses import LossFunction, MeanSquaredError, BinaryCrossEntropy
@@ -109,11 +110,44 @@ class NeuralNetwork:
         else:
             raise ValueError("No metric specified for the neural network.")
 
+    def save(self, file_path: str):
+            """
+            Save model weights and biases using pickle.
+            """
+            model_data = {
+                "weights": [layer.weights for layer in self.layers if hasattr(layer, "weights")],
+                "biases": [layer.biases for layer in self.layers if hasattr(layer, "biases")]
+            }
+
+            with open(file_path, "wb") as f:
+                pickle.dump(model_data, f)
+
+            print(f"Model saved successfully to {file_path}")
+
+    def load(self, file_path: str):
+        """
+        Load model weights and biases using pickle.
+        """
+        with open(file_path, "rb") as f:
+            model_data = pickle.load(f)
+
+        weights = model_data["weights"]
+        biases = model_data["biases"]
+
+        index = 0
+        for layer in self.layers:
+            if hasattr(layer, "weights"):
+                layer.weights = weights[index]
+                layer.biases = biases[index]
+                index += 1
+
+        print(f"Model loaded successfully from {file_path}")
 
 class Dataset:
     def __init__(self, X, y):
         self.X = X
         self.y = y
+        
 
 if __name__ == '__main__':
     from activation import SigmoidActivation, ReLUActivation
@@ -147,7 +181,7 @@ if __name__ == '__main__':
     #dataset_test = Dataset(X_test, y_test)
     
     # network
-    net = NeuralNetwork(epochs=100, batch_size=16, learning_rate=0.005, verbose=True,
+    net = NeuralNetwork(epochs=10, batch_size=16, learning_rate=0.005, verbose=True,
                         optimizer=Optimizer(learning_rate=0.005, momentum=0.9, weight_decay=1e-5),
                         loss=BinaryCrossEntropy, metric=accuracy)
     
@@ -166,6 +200,6 @@ if __name__ == '__main__':
 
     # train
     net.fit(dataset_treino)
-        
+    net.save("../models/rnn.pkl")
     
 

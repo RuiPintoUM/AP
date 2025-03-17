@@ -85,6 +85,39 @@ class RecurrentNeuralNetwork:
             return self.metric(dataset.y, predictions)
         else:
             raise ValueError("No metric specified for the neural network.")
+        
+    def save(self, file_path: str):
+        """
+        Save model weights and biases using pickle.
+        """
+        model_data = {
+            "weights": [layer.weights for layer in self.layers if hasattr(layer, "weights")],
+            "biases": [layer.biases for layer in self.layers if hasattr(layer, "biases")]
+        }
+
+        with open(file_path, "wb") as f:
+            pickle.dump(model_data, f)
+
+        print(f"Model saved successfully to {file_path}")
+
+    def load(self, file_path: str):
+        """
+        Load model weights and biases using pickle.
+        """
+        with open(file_path, "rb") as f:
+            model_data = pickle.load(f)
+
+        weights = model_data["weights"]
+        biases = model_data["biases"]
+
+        index = 0
+        for layer in self.layers:
+            if hasattr(layer, "weights"):
+                layer.weights = weights[index]
+                layer.biases = biases[index]
+                index += 1
+
+        print(f"Model loaded successfully from {file_path}")
 
 if __name__ == '__main__':
     from layers import RecurrentLayer, DenseLayer, DropoutLayer  # Update import
@@ -129,3 +162,7 @@ if __name__ == '__main__':
     # Testar o modelo
     out = rnn.predict(dataset_test)
     print(f"Score: {rnn.score(dataset_test, out)}")
+    
+    rnn.save("../models/rnn.pkl")
+    
+    

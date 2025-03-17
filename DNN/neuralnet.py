@@ -110,38 +110,38 @@ class NeuralNetwork:
         else:
             raise ValueError("No metric specified for the neural network.")
 
-    def save(self, file_path: str):
-            """
-            Save model weights and biases using pickle.
-            """
-            model_data = {
-                "weights": [layer.weights for layer in self.layers if hasattr(layer, "weights")],
-                "biases": [layer.biases for layer in self.layers if hasattr(layer, "biases")]
-            }
-
-            with open(file_path, "wb") as f:
-                pickle.dump(model_data, f)
-
-            print(f"Model saved successfully to {file_path}")
+    def save(self, file_path: str, vectorizer=None):
+        """
+        Save model weights, biases, and vectorizer using pickle.
+        """
+        model_data = {
+            "weights": [layer.weights for layer in self.layers if hasattr(layer, "weights")],
+            "biases": [layer.biases for layer in self.layers if hasattr(layer, "biases")],
+            "vectorizer": vectorizer  # Salvar o vectorizer junto
+        }
+        
+        with open(file_path, "wb") as f:
+            pickle.dump(model_data, f)
+        print(f"Model and vectorizer saved successfully to {file_path}")
 
     def load(self, file_path: str):
         """
-        Load model weights and biases using pickle.
+        Load model weights, biases, and vectorizer using pickle.
+        Returns the vectorizer as well.
         """
         with open(file_path, "rb") as f:
             model_data = pickle.load(f)
-
         weights = model_data["weights"]
         biases = model_data["biases"]
-
+        vectorizer = model_data.get("vectorizer")  # Carregar o vectorizer, se existir
         index = 0
         for layer in self.layers:
             if hasattr(layer, "weights"):
                 layer.weights = weights[index]
                 layer.biases = biases[index]
                 index += 1
-
         print(f"Model loaded successfully from {file_path}")
+        return vectorizer
 
 class Dataset:
     def __init__(self, X, y):
@@ -200,6 +200,6 @@ if __name__ == '__main__':
 
     # train
     net.fit(dataset_treino)
-    net.save("../models/rnn.pkl")
+    net.save("../models/dnn.pkl", vectorizer=vectorizer)
     
 

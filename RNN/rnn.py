@@ -86,7 +86,7 @@ class RecurrentNeuralNetwork:
             raise ValueError("No metric specified for the neural network.")
 
 if __name__ == '__main__':
-    from layers import RecurrentLayer, DenseLayer  # Update import
+    from layers import RecurrentLayer, DenseLayer, DropoutLayer  # Update import
     from activation import SigmoidActivation, ReLUActivation
     from metrics import accuracy
     from data import read_csv
@@ -101,8 +101,10 @@ if __name__ == '__main__':
     # Adicionar camadas RNN
     n_features = dataset_treino.X.shape[2]  # (samples, time_steps, features)
     rnn.add(RecurrentLayer(32, (n_features,)))  # Camada recorrente
+    rnn.add(DropoutLayer(0.3))
     rnn.add(DenseLayer(16))  # Camada densa
     rnn.add(ReLUActivation())  
+    rnn.add(DropoutLayer(0.4))
     rnn.add(DenseLayer(1))  # Saída final
     rnn.add(SigmoidActivation())  
 

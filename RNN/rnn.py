@@ -1,9 +1,11 @@
 import numpy as np
-from layers import RecurrentLayer
-from losses import BinaryCrossEntropy
-from optimizer import Optimizer
+import pandas as pd
+from layers import RecurrentLayer, DenseLayer, DropoutLayer  # Update import
+from activation import SigmoidActivation, ReLUActivation
 from metrics import accuracy
+from losses import BinaryCrossEntropy
 from LogisticRegression import LogisticRegression
+from data import read_csv  # Função para ler o CSV
 
 class RecurrentNeuralNetwork:
     def __init__(self, epochs=100, batch_size=16, optimizer=None, learning_rate=0.01, verbose=False, loss=BinaryCrossEntropy, metric=accuracy):
@@ -119,18 +121,14 @@ class RecurrentNeuralNetwork:
 
         print(f"Model loaded successfully from {file_path}")
 
-if __name__ == '__main__':
-    from layers import RecurrentLayer, DenseLayer, DropoutLayer  # Update import
-    from activation import SigmoidActivation, ReLUActivation
-    from metrics import accuracy
-    from data import read_csv
 
+if __name__ == '__main__':
     # Carregar dados
-    dataset_treino, vectorizer = read_csv('../datasets/combined_dataset_treino.csv', text_column='Text', label_column='Label')
-    dataset_test, _ = read_csv('../datasets/combined_dataset_test.csv', text_column='Text', label_column='Label', vectorizer=vectorizer)
+    dataset_treino, vectorizer = read_csv('../dataset2_inputs.csv', text_column='Text', label_column='Label')
+    dataset_test, _ = read_csv('../dataset2_inputs.csv', text_column='Text', label_column='Label', vectorizer=vectorizer)
 
     # Criar modelo RNN
-    rnn = RecurrentNeuralNetwork(epochs=50, batch_size=16, learning_rate=0.005, verbose=True)
+    rnn = RecurrentNeuralNetwork(epochs=5, batch_size=16, learning_rate=0.005, verbose=True)
 
     # Adicionar camadas RNN
     n_features = dataset_treino.X.shape[2]  # (samples, time_steps, features)
@@ -145,7 +143,7 @@ if __name__ == '__main__':
     # Treinar o modelo
     rnn.fit(dataset_treino)
     
-        # Obter representações da RNN
+    # Obter representações da RNN
     rnn_train_output = rnn.predict(dataset_treino)
     rnn_test_output = rnn.predict(dataset_test)
 
@@ -163,6 +161,5 @@ if __name__ == '__main__':
     out = rnn.predict(dataset_test)
     print(f"Score: {rnn.score(dataset_test, out)}")
     
+    # Salvar o modelo
     rnn.save("../models/rnn.pkl")
-    
-    

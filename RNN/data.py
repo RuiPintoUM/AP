@@ -43,26 +43,33 @@ class Data:
         }
         return pd.DataFrame.from_dict(data, orient="index", columns=self.features)
 
-def read_csv(filename, sep=',', text_column='Text', label_column='Label', vectorizer=None, sequence_length=10):
+# Updated function to read CSV and process data
+def read_csv(filename, sep=',', text_column='Text', label_column='Id', vectorizer=None, sequence_length=10):
+    """
+    Lê um CSV e converte o texto para uma sequência numérica.
+    """
     data = pd.read_csv(filename, sep=sep, quotechar='"', on_bad_lines='skip')
+
     if vectorizer is None:
         vectorizer = CountVectorizer()
         X = vectorizer.fit_transform(data[text_column].values).toarray()
     else:
         X = vectorizer.transform(data[text_column].values).toarray()
-    # Criar sequências com comprimento fixo e alinhar labels
+
+    # Criar sequências com comprimento fixo
     X_seq = []
-    y_seq = []
     for i in range(len(X) - sequence_length):
         X_seq.append(X[i:i+sequence_length])
-        y_seq.append(data[label_column].values[i + sequence_length - 1])  # Label for the last step
+
     X_seq = np.array(X_seq)  # (samples, time_steps, features)
+
+    # Processar labels
     label_encoder = LabelEncoder()
-    y_seq = label_encoder.fit_transform(y_seq)
-    return Data(X=X_seq, y=y_seq, features=None, label=label_column), vectorizer
-    # Example usage with the provided dataset
+    y = label_encoder.fit_transform(data[label_column].values)
 
+    return Data(X=X_seq, y=y, features=None, label=label_column), vectorizer
 
+# Example usage with the provided dataset
 if __name__ == '__main__':
     filename = '../datasets/combined_dataset.csv'
     dataset = read_csv(filename)

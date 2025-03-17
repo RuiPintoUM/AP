@@ -57,17 +57,19 @@ def read_csv(filename, sep=',', text_column='Text', label_column='Label', vector
         X = vectorizer.transform(data[text_column].values).toarray()
 
     # Criar sequências com comprimento fixo
-    X_seq = []
-    for i in range(len(X) - sequence_length):
-        X_seq.append(X[i:i+sequence_length])
+    X_seq, y_seq = [], []
+    for i in range(len(X) - sequence_length + 1):  # Garante que há rótulos para cada sequência
+        X_seq.append(X[i:i+sequence_length])  # Adiciona sequência
+        y_seq.append(data[label_column].values[i + sequence_length - 1])  # Pega o rótulo correspondente
 
     X_seq = np.array(X_seq)  # (samples, time_steps, features)
+    y_seq = np.array(y_seq)  # (samples,)
 
-    # Processar labels
+    # Codificar labels
     label_encoder = LabelEncoder()
-    y = label_encoder.fit_transform(data[label_column].values)
+    y_seq = label_encoder.fit_transform(y_seq)
 
-    return Data(X=X_seq, y=y, features=None, label=label_column), vectorizer
+    return Data(X=X_seq, y=y_seq, features=None, label=label_column), vectorizer
 
 # Example usage with the provided dataset
 if __name__ == '__main__':

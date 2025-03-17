@@ -164,24 +164,24 @@ if __name__ == '__main__':
                                 text_column='Text',  # Nome exato da coluna de texto no CSV
                                 label_column='Label')  # Nome exato da coluna de rótulos no CSV
     
-    dataset_test , _ = read_csv('../datasets/combined_dataset_test.csv', 
-                        sep=',', 
-                        text_column='Text',  # Nome exato da coluna de texto no CSV
-                        label_column='Label', # Nome exato da coluna de rótulos no CSV
-                        vectorizer=vectorizer)  
+    #dataset_test , _ = read_csv('../datasets/combined_dataset_test.csv', 
+    #                    sep=',', 
+    #                    text_column='Text',  # Nome exato da coluna de texto no CSV
+    #                    label_column='Label', # Nome exato da coluna de rótulos no CSV
+    #                    vectorizer=vectorizer)  
 
     # Dividir os dados corretamente
-    #X_train, X_test, y_train, y_test = train_test_split(
-    #    dataset_treino.X, dataset_treino.y, 
-    #    test_size=0.2, random_state=42, stratify=dataset_treino.y
-    #)
+    X_train, X_test, y_train, y_test = train_test_split(
+        dataset_treino.X, dataset_treino.y, 
+        test_size=0.3, random_state=42, stratify=dataset_treino.y
+    )
 
     # Atualizar os datasets corretamente
-    #dataset_treino = Dataset(X_train, y_train)
-    #dataset_test = Dataset(X_test, y_test)
+    dataset_treino = Dataset(X_train, y_train)
+    dataset_test = Dataset(X_test, y_test)
     
     # network
-    net = NeuralNetwork(epochs=10, batch_size=16, learning_rate=0.005, verbose=True,
+    net = NeuralNetwork(epochs=100, batch_size=16, learning_rate=0.005, verbose=True,
                         optimizer=Optimizer(learning_rate=0.005, momentum=0.9, weight_decay=1e-5),
                         loss=BinaryCrossEntropy, metric=accuracy)
     

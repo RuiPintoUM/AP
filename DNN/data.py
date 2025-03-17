@@ -4,6 +4,9 @@
 import numpy as np
 import pandas as pd
 import re
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.preprocessing import LabelEncoder
+
 
 class Data:
     def __init__(self, X, y = None, features = None, label= None):

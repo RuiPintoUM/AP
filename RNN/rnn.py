@@ -1,11 +1,15 @@
 import numpy as np
 import pandas as pd
-from layers import RecurrentLayer, DenseLayer, DropoutLayer  # Update import
+import sys
+sys.path.append('../')
+from RNN.layers import RecurrentLayer, DenseLayer, DropoutLayer  # Update import
 from activation import SigmoidActivation, ReLUActivation
 from metrics import accuracy
 from losses import BinaryCrossEntropy
 from LogisticRegression import LogisticRegression
 from data import read_csv  # Função para ler o CSV
+from optimizer import Optimizer  # Make sure the path is correct
+
 import pickle
 
 class RecurrentNeuralNetwork:
@@ -125,11 +129,11 @@ class RecurrentNeuralNetwork:
 
 if __name__ == '__main__':
     # Carregar dados
-    dataset_treino, vectorizer = read_csv('../dataset2_inputs.csv', text_column='Text', label_column='Label')
-    dataset_test, _ = read_csv('../dataset2_inputs.csv', text_column='Text', label_column='Label', vectorizer=vectorizer)
+    dataset_treino, vectorizer = read_csv('../datasets/ds/balanced_output.csv', text_column='Text', label_column='Label')
+    #dataset_test, _ = read_csv('../datasets/dataset2_inputs.csv', vectorizer=vectorizer)
 
     # Criar modelo RNN
-    rnn = RecurrentNeuralNetwork(epochs=5, batch_size=16, learning_rate=0.005, verbose=True)
+    rnn = RecurrentNeuralNetwork(epochs=100, batch_size=16, learning_rate=0.005, verbose=True)
 
     # Adicionar camadas RNN
     n_features = dataset_treino.X.shape[2]  # (samples, time_steps, features)
@@ -146,21 +150,21 @@ if __name__ == '__main__':
     
     # Obter representações da RNN
     rnn_train_output = rnn.predict(dataset_treino)
-    rnn_test_output = rnn.predict(dataset_test)
+    #rnn_test_output = rnn.predict(dataset_test)
 
     # Treinar o modelo de regressão logística usando as representações da RNN
     logistic_regression = LogisticRegression(learning_rate=0.01, num_iterations=1000)
     logistic_regression.fit(rnn_train_output, dataset_treino.y)
 
     # Testar o modelo de regressão logística
-    logistic_predictions = logistic_regression.predict(rnn_test_output)
-    logistic_score = logistic_regression.score(rnn_test_output, dataset_test.y)
+    #logistic_predictions = logistic_regression.predict(rnn_test_output)
+    #logistic_score = logistic_regression.score(rnn_test_output, dataset_test.y)
 
-    print(f"Score da regressão logística: {logistic_score}")
+    #print(f"Score da regressão logística: {logistic_score}")
 
     # Testar o modelo
-    out = rnn.predict(dataset_test)
-    print(f"Score: {rnn.score(dataset_test, out)}")
+    #out = rnn.predict(dataset_test)
+    #print(f"Score: {rnn.score(dataset_test, out)}")
     
     # Salvar o modelo
-    rnn.save("../models/rnn.pkl")
+    rnn.save("../models/rnn.pkl", vectorizer=vectorizer)

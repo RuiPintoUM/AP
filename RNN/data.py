@@ -58,21 +58,24 @@ def read_csv(filename, sep=',', text_column='Text', label_column='Id', vectorize
 
     # Criar sequências com comprimento fixo
     X_seq = []
+    y_seq = []
     for i in range(len(X) - sequence_length):
         X_seq.append(X[i:i+sequence_length])
+        y_seq.append(data[label_column].iloc[i+sequence_length-1])  # The label for the last element in the sequence
 
     X_seq = np.array(X_seq)  # (samples, time_steps, features)
+    y_seq = np.array(y_seq)  # Adjusted labels for each sequence
 
     # Processar labels
     label_encoder = LabelEncoder()
-    y = label_encoder.fit_transform(data[label_column].values)
+    y_seq = label_encoder.fit_transform(y_seq)  # Encode the labels for the sequences
 
-    return Data(X=X_seq, y=y, features=None, label=label_column), vectorizer
+    return Data(X=X_seq, y=y_seq, features=None, label=label_column), vectorizer
 
 # Example usage with the provided dataset
 if __name__ == '__main__':
     filename = '../datasets/combined_dataset.csv'
-    dataset = read_csv(filename)
+    dataset, vectorizer = read_csv(filename, text_column='Text', label_column='Label')
     print(dataset.shape())
     print("Has label:", dataset.has_label())
     print("Classes:", dataset.get_classes())

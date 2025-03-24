@@ -2,7 +2,7 @@ import google.generativeai as genai
 import csv
 import time
 
-GOOGLE_API_KEY = 'AIzaSyDlTl5fVv3_dJEkKlIgnQvBl1vwPpOdyXA'
+GOOGLE_API_KEY = 'chave_Gemini'
 genai.configure(api_key=GOOGLE_API_KEY)
 
 prompt = "Escreva um texto de aproximadamente 140 palavras que conecte fenômenos naturais e avanços humanos de forma ampla. Inicie explorando um processo ou evento fundamental da natureza, como a formação de algo no universo, na Terra ou em organismos vivos. Depois, relacione isso a um aspecto da existência humana, como saúde, comportamento ou adaptação ao ambiente. Inclua uma perspectiva sobre como a ciência ou a tecnologia ajudam a compreender ou moldar esse cenário, seja por meio de descobertas, inovações ou soluções para desafios. Finalize com uma reflexão sobre o impacto disso no presente ou no futuro, considerando benefícios, riscos ou mistérios ainda não resolvidos. Mantenha o tom acessível e o conteúdo variado, permitindo diferentes interpretações e exemplos a cada uso."
